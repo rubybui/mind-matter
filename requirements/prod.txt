@@ -1,0 +1,45 @@
+# === Core Framework and Utilities ===
+click>=7.0  # Command-line utility for scripting
+Flask==2.3.0  # Core web framework
+Werkzeug==2.3.2  # WSGI toolkit used by Flask, downgrade werkzeug to compatible with flask-login
+
+# === Database Support ===
+Flask-SQLAlchemy==3.1.1  # SQLAlchemy integration with Flask
+psycopg2-binary==2.9.10  # PostgreSQL adapter for Python
+SQLAlchemy==2.0.36  # Core ORM for advanced database interaction
+flask-marshmallow==1.2.1
+marshmallow==3.23.1
+marshmallow-sqlalchemy==1.1.0
+Flask-Cors==5.0.0
+mdgen
+
+Flask-Migrate==4.0.7  # Handles database migrations with Alembic
+
+# === Authentication and User Management ===
+Flask-Login==0.6.3  # User session management for Flask
+
+# === Deployment ===
+gevent==24.11.1  # Asynchronous networking library for concurrent requests
+gunicorn>=19.9.0  # WSGI HTTP server for deploying Python applications
+supervisor==4.2.5  # Process manager for running background services
+
+
+# === Caching ===
+Flask-Caching>=2.0.2  # Adds caching support for better performance
+
+# === Environment Variable Management ===
+environs==11.2.1  # Simplifies parsing and managing environment variables
+python-dotenv==1.0.1
+
+# === Debugging ===
+Flask-DebugToolbar
+
+# === Forms ===
+Flask-WTF
+
+# === Static Files ===
+Flask-Static-Digest
+
+# === gRPC ===
+grpcio==1.69.0
+grpcio-tools==1.69.0

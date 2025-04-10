@@ -1,0 +1,50 @@
+x-build-args: &build_args
+  INSTALL_PYTHON_VERSION: "3.12.8"
+
+x-default-volumes: &default_volumes
+  volumes:
+    - ./:/app
+
+services:
+  flask-dev:
+    build:
+      context: .
+      target: development
+      args:
+        <<: *build_args
+    image: "mind-matter-development"
+    ports:
+      - "5000:5000"
+      - "2992:2992"
+    <<: *default_volumes
+
+  flask-prod:
+    build:
+      context: .
+      target: production
+      args:
+        <<: *build_args
+    image: "mind-matter-production"
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_ENV: production
+      FLASK_DEBUG: 0
+      LOG_LEVEL: info
+      GUNICORN_WORKERS: 4
+    <<: *default_volumes
+
+  manage:
+    build:
+      context: .
+      target: development
+      args:
+        <<: *build_args
+    entrypoint: flask
+    environment:
+      FLASK_ENV: production
+      FLASK_DEBUG: 0
+    image: "mind-matter-manage"
+    stdin_open: true
+    tty: true
+    <<: *default_volumes
