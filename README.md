@@ -49,13 +49,13 @@ There are three main services:
 To run the development version of the app
 
 ```bash
-docker compose up flask-dev
+docker compose up mind-matter-flask-dev
 ```
 
 To run the production version of the app
 
 ```bash
-docker compose up flask-prod
+docker compose up  mind-matter-flask-prod
 ```
 
 The list of `environment:` variables in the `docker compose.yml` file takes precedence over any variables specified in `.env`.
@@ -63,22 +63,22 @@ The list of `environment:` variables in the `docker compose.yml` file takes prec
 To run any commands using the `Flask CLI`
 
 ```bash
-docker compose run --rm manage <<COMMAND>>
+docker compose run --rm mind-matter-manage <<COMMAND>>
 ```
 
 Therefore, to initialize a database you would run
 Only init if there is no migrations/versions. Migrate when there is changes in model, and upgrade to create db and tables
 
 ```bash
-docker compose run --rm manage db init
-docker compose run --rm manage db migrate
-docker compose run --rm manage db upgrade
+docker compose run --rm mind-matter-manage db init
+docker compose run --rm mind-matter-manage db migrate
+docker compose run --rm mind-matter-manage db upgrade
 ```
 
 To seed the database do --user <number> --recipes <number>
 
 ```bash
-docker compose run --rm manage seed --users 10
+docker compose run --rm mind-matter-manage seed --users 10
 ```
 
 ```bash
@@ -92,7 +92,7 @@ pip install -r requirements/dev.txt
 To open the interactive shell, run
 
 ```bash
-docker compose run --rm manage shell
+docker compose run --rm mind-matter-manage shell
 
 ```
 
@@ -103,13 +103,13 @@ By default, you will have access to the flask `app`.
 To run all tests, run
 
 ```bash
-docker compose run --rm manage test
+docker compose run --rm mind-matter-manage test
 ```
 
 To run the linter, run
 
 ```bash
-docker compose run --rm manage lint
+docker compose run --rm mind-matter-manage lint
 ```
 
 The `lint` command will attempt to fix any linting/style errors in the code. If you only want to know if the code will pass CI and do not wish for the linter to make changes, add the `--check` argument.
@@ -119,18 +119,18 @@ The `lint` command will attempt to fix any linting/style errors in the code. If 
 Whenever a database migration needs to be made. Run the following commands
 
 ```bash
-docker compose run --rm manage db migrate
+docker compose run --rm mind-matter-manage db migrate
 ```
 
 This will generate a new migration script. Then run
 
 ```bash
-docker compose run --rm manage db upgrade
+docker compose run --rm mind-matter-manage db upgrade
 ```
 
 To apply the migration.
 
-For a full migration command reference, run `docker compose run --rm manage db --help`.
+For a full migration command reference, run `docker compose run --rm mind-matter-manage db --help`.
 
 If you will deploy your application remotely (e.g on Heroku) you should add the `migrations` folder to version control.
 You can do this after `flask db migrate` by running the following commands

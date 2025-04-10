@@ -6,7 +6,7 @@ x-default-volumes: &default_volumes
     - ./:/app
 
 services:
-  flask-dev:
+  mind-matter-flask-dev:
     build:
       context: .
       target: development
@@ -18,7 +18,7 @@ services:
       - "2992:2992"
     <<: *default_volumes
 
-  flask-prod:
+  mind-matter-flask-prod:
     build:
       context: .
       target: production
@@ -34,7 +34,7 @@ services:
       GUNICORN_WORKERS: 4
     <<: *default_volumes
 
-  manage:
+  mind-matter-manage:
     build:
       context: .
       target: development
