@@ -37,3 +37,13 @@ class SurveyRepository(Repository):
             raise ValueError("Resource not found")
         self.session.delete(survey)
         self.session.commit()
+
+    def get_by_user_id(self, user_id: str) -> Optional[Survey]:
+        return self.session.query(Survey).filter(Survey.user_id == user_id).first()
+    def get_by_survey_id(self, survey_id: str) -> Optional[Survey]:
+        return self.session.query(Survey).filter(Survey.survey_id == survey_id).first()      
+    def get_by_survey_name(self, survey_name: str) -> Optional[Survey]:
+        return self.session.query(Survey).filter(Survey.survey_name == survey_name).first()
+    def get_by_survey_type(self, survey_type: str) -> Optional[Survey]:
+        return self.session.query(Survey).filter(Survey.survey_type == survey_type).first() 
+        
