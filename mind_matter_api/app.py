@@ -43,6 +43,7 @@ def create_app(config_object="mind_matter_api.settings"):
     register_shellcontext(app)
     register_commands(app)
     register_routes(app)
+    print(f'app.url_map')
     configure_logger(app)
     CORS(app, supports_credentials=True, resources={r"/*": {"origins": app.config['CORS_ALLOWED_ORIGINS']}})
     logger.info(f"CORS enabled for {app.config['CORS_ALLOWED_ORIGINS']}")

@@ -1,8 +1,8 @@
-"""Initial migration
+"""empty message
 
-Revision ID: 55bf9ca415b9
+Revision ID: 4019b50b07c6
 Revises: 
-Create Date: 2025-04-10 10:42:59.962526
+Create Date: 2025-04-24 09:41:37.338673
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '55bf9ca415b9'
+revision = '4019b50b07c6'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -38,6 +38,7 @@ def upgrade():
     op.create_table('users',
     sa.Column('user_id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('full_name', sa.String(length=100), nullable=False),
+    sa.Column('share_data', sa.Boolean(), nullable=False),
     sa.Column('email', sa.String(length=100), nullable=False),
     sa.Column('role', sa.String(length=20), nullable=True),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
@@ -105,13 +106,6 @@ def upgrade():
     sa.ForeignKeyConstraint(['created_by'], ['users.user_id'], ),
     sa.PrimaryKeyConstraint('survey_id')
     )
-    op.create_table('users_consent',
-    sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('share_data', sa.Boolean(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
-    sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ),
-    sa.PrimaryKeyConstraint('user_id')
-    )
     op.create_table('campaign_participation',
     sa.Column('participation_id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('campaign_id', sa.Integer(), nullable=False),
@@ -168,7 +162,6 @@ def downgrade():
     op.drop_table('survey_responses')
     op.drop_table('survey_questions')
     op.drop_table('campaign_participation')
-    op.drop_table('users_consent')
     op.drop_table('surveys')
     op.drop_table('reward_redemptions')
     op.drop_table('notifications')

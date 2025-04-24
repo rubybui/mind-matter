@@ -2,7 +2,6 @@ from flask_marshmallow import Marshmallow
 from marshmallow import fields, Schema, validate
 from mind_matter_api.models import (
     User,
-    UserConsent,
     Survey,
     SurveyQuestion,
     SurveyResponse,
@@ -31,19 +30,24 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
         include_fk = True  # Include foreign keys in the schema
 
     id = fields.Str(dump_only=True)  # Explicitly declare 'id' as dump-only
-    username = fields.Str(required=True)
+    full_name = fields.Str(
+        required=True,
+        validate=validate.Length(min=3, max=100),
+        example="John Doe"
+    )
     email = fields.Email(required=True)
+    share_data = fields.Boolean(default=False)
 
 
 # Marshmallow Schemas for Query/Path/Body validation (User)
 class UserQuerySchema(Schema):
-    username = fields.Str(required=True, example="john_doe")
+    full_name = fields.Str(required=True, example="john_doe")
 
 
 class UserBodySchema(Schema):
-    username = fields.Str(required=True, validate=validate.Length(min=3, max=50))
+    full_name = fields.Str(required=True, validate=validate.Length(min=3, max=50))
     email = fields.Email(required=True, example="john@example.com")
-    lastname = fields.Str(required=True, validate=validate.Length(min=1, max=50), example="Doe")
+
     password = fields.Str(required=True, validate=validate.Length(min=6), load_only=True)
 
 
@@ -160,15 +164,4 @@ class EmergencyContactSchema(ma.SQLAlchemyAutoSchema):
         include_fk = True
 
 
-# -------------------------------------------------------------
-# User Consent Schema
-# -------------------------------------------------------------
-class UserConsentSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = UserConsent
-        load_instance = True
-        include_fk = True
-    user = fields.Nested(UserSchema, only=("id", "username", "email"))
-    consent_given = fields.Boolean(required=True)
-    updated_at = fields.DateTime(dump_only=True)
-    created_at = fields.DateTime(dump_only=True)    
+  

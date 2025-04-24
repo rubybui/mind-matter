@@ -11,7 +11,7 @@ class UserService(BaseService):
 
     def get_user(self, user_id: str) -> User:
         user = self.user_repository.get(user_id)
-        return user
+        return user 
 
     def create_user(self, user_data: UserBodySchema) -> User:
         new_user = User(**user_data)
@@ -20,7 +20,7 @@ class UserService(BaseService):
 
     def get_users(self) -> list[User]:
         # TODO: call UserRepository.get_users when it is implemented
-        return [User(username="john_doe", email="john.doe@gmail.com")]
+        return [User(full_name="john_doe", email="john.doe@gmail.com")]
 
     def authenticate_user(self, login_data: dict) -> User:
         email = login_data.get("email")
@@ -40,3 +40,23 @@ class UserService(BaseService):
             return False
         return True
 #
+    def update_user(self, user_id: str, user_data: dict) -> User:
+        user = self.user_repository.get(user_id)
+        if not user:
+            raise ValueError("User not found")
+        for key, value in user_data.items():
+            setattr(user, key, value)
+        self.user_repository.update(user)
+        return user
+    def delete_user(self, user_id: str) -> None:
+        user = self.user_repository.get(user_id)
+        if not user:
+            raise ValueError("User not found")
+        self.user_repository.delete(user)
+    def update_consent(self, user_id: str, consent: bool) -> User:
+        user = self.user_repository.get(user_id)
+        if not user:
+            raise ValueError("User not found")
+        user.share_data = consent
+        self.user_repository.update(user)
+        return user
