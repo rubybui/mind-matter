@@ -3,7 +3,7 @@ from mind_matter_api.extensions import db
 # Import all model files so they are registered with SQLAlchemy
 # Import all model files so they are registered with SQLAlchemy
 from .users import User
-from .users_consent import UserConsent
+
 from .surveys import Survey, SurveyQuestion, SurveyResponse
 from .survey_answers import SurveyAnswer
 from .schedules import SurveySchedule
@@ -16,7 +16,6 @@ from .emergency_contacts import EmergencyContact
 __all__ = [
     "db",
     "User",
-    "UserConsent",
     "Survey",
     "SurveyQuestion",
     "SurveyResponse",

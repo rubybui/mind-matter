@@ -2,6 +2,7 @@ from mind_matter_api.models.users import User
 from mind_matter_api.repositories.types import Repository
 
 from mind_matter_api.models import db
+from typing import Any, Dict, List, Optional
 
 
 class UserRepository(Repository):
@@ -36,6 +37,14 @@ class UserRepository(Repository):
             raise ValueError("Resource not found")
         for key, value in data.items():
             setattr(user, key, value)
+        self.session.commit()
+        return user
+    
+    def update_consent(self, resource_id: Any, consent: bool) -> User:
+        user = self.get_by_id(resource_id)
+        if not user:
+            raise ValueError("Resource not found")
+        user.share_data = consent
         self.session.commit()
         return user
 

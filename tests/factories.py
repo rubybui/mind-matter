@@ -19,8 +19,7 @@ class UserFactory(Factory):
         model = User
 
     id = LazyFunction(lambda: str(uuid.uuid4()))
-    username = Faker("user_name")
+    full_name = Faker("user_name")
     email = Faker("email")
-    lastname = Faker("last_name")
     password = LazyFunction(lambda: generate_password_hash(str(Faker("password"))))
 

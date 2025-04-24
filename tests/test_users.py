@@ -15,6 +15,6 @@ def user_fixture(db_session):
 def test_user_creation(user_fixture):
     """Test that a user is created successfully."""
     user = User.query.first()
-    assert user.username is not None
+    assert user.full_name is not None
     assert user.email is not None
-    print(f"Created user: {user.username}, {user.email}")
+    print(f"Created user: {user.full_name}, {user.email}")
