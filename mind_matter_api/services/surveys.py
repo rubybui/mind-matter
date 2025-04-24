@@ -1,41 +1,118 @@
+from typing import Any, Dict, List, Optional
+from mind_matter_api.repositories.surveys import SurveyRepository
+from mind_matter_api.repositories.survey_questions import SurveyQuestionRepository
+from mind_matter_api.repositories.survey_responses import SurveyResponseRepository
+from mind_matter_api.repositories.survey_answers import SurveyAnswerRepository
+from mind_matter_api.models.surveys import Survey
+from mind_matter_api.models.surveys import SurveyQuestion, SurveyResponse
+from mind_matter_api.models.survey_answers import SurveyAnswer
 
-from mind_matter_api.repositories.survey import SurveyRepository
-from mind_matter_api.models.surveys import Survey, SurveyQuestion, SurveyResponse
-from mind_matter_api.schemas.surveys import SurveySchema
+class SurveyService:
+    """
+    Service layer for Survey operations, including surveys, questions, responses, and answers.
+    """
+    def __init__(
+        self,
+        survey_repo: SurveyRepository,
+        question_repo: SurveyQuestionRepository,
+        response_repo: SurveyResponseRepository,
+        answer_repo: SurveyAnswerRepository
+    ):
+        self.survey_repo = survey_repo
+        self.question_repo = question_repo
+        self.response_repo = response_repo
+        self.answer_repo = answer_repo
 
+    # --- Survey CRUD ---
+    def get_all(self,
+                page: int = 1,
+                page_size: int = 10,
+                filters: Optional[Dict[str, Any]] = None
+               ) -> List[Survey]:
+        """
+        Retrieve a paginated list of surveys, optionally filtered.
+        """
+        return self.survey_repo.get_all(page, page_size, filters)
 
-class SurveyService(BaseService):
-    def __init__(self, survey_repository: SurveyRepository):
-        self.survey_repository = survey_repository
+    def get_by_id(self, survey_id: Any) -> Optional[Survey]:
+        """Retrieve a single survey by its ID."""
+        return self.survey_repo.get_by_id(survey_id)
 
-    def get_survey(self, survey_id: str) -> Survey:
-        survey = self.survey_repository.get(survey_id)
-        return survey
-    def create_survey(self, survey_data: SurveySchema) -> Survey:
-        new_survey = Survey(**survey_data)
-        created_survey = self.survey_repository.create(new_survey)
-        return created_survey
-    def get_surveys(self) -> list[Survey]:
-        surveys = self.survey_repository.get_all()
-        return surveys
-    def get_survey_questions(self, survey_id: str) -> list[SurveyQuestion]:
-        survey = self.survey_repository.get(survey_id)
-        return survey.questions
-    def get_survey_responses(self, survey_id: str) -> list[SurveyResponse]:
-        survey = self.survey_repository.get(survey_id)
-        return survey.responses
-    def submit_survey_response(self, survey_id: str, response_data: dict) -> SurveyResponse:
-        survey = self.survey_repository.get(survey_id)
-        new_response = SurveyResponse(**response_data)
-        survey.responses.append(new_response)
-        self.survey_repository.update(survey)
-        return new_response
-    def update_survey(self, survey_id: str, survey_data: SurveySchema) -> Survey:
-        survey = self.survey_repository.get(survey_id)
-        survey.update(**survey_data)
-        self.survey_repository.update(survey)
-        return survey
+    def create(self, data: Dict[str, Any]) -> Survey:
+        """Create a new survey with the given data."""
+        survey = Survey(**data)
+        return self.survey_repo.create(survey)
 
-    def get_survey_by_user_id(self, user_id: str) -> Survey:
-        survey = self.survey_repository.get_by_user_id(user_id)
-        return survey
+    def update(self, survey_id: Any, data: Dict[str, Any]) -> Survey:
+        """Update an existing survey with new data."""
+        return self.survey_repo.update(survey_id, data)
+
+    def delete(self, survey_id: Any) -> None:
+        """Delete a survey by its ID."""
+        self.survey_repo.delete(survey_id)
+
+    # --- Question CRUD ---
+    def get_questions(self, survey_id: Any) -> List[SurveyQuestion]:
+        """Retrieve all questions for a given survey."""
+        return self.question_repo.get_all(filters={'survey_id': survey_id})
+
+    def get_question_by_id(self, question_id: Any) -> Optional[SurveyQuestion]:
+        """Retrieve a question by its ID."""
+        return self.question_repo.get_by_id(question_id)
+
+    def create_question(self, data: Dict[str, Any]) -> SurveyQuestion:
+        """Create a new survey question."""
+        question = SurveyQuestion(**data)
+        return self.question_repo.create(question)
+
+    def update_question(self, question_id: Any, data: Dict[str, Any]) -> SurveyQuestion:
+        """Update an existing question."""
+        return self.question_repo.update(question_id, data)
+
+    def delete_question(self, question_id: Any) -> None:
+        """Delete a question by ID."""
+        self.question_repo.delete(question_id)
+
+    # --- Response CRUD ---
+    def get_responses(self, survey_id: Any) -> List[SurveyResponse]:
+        """Retrieve all responses for a given survey."""
+        return self.response_repo.get_all(filters={'survey_id': survey_id})
+
+    def get_response_by_id(self, response_id: Any) -> Optional[SurveyResponse]:
+        """Retrieve a single response by ID."""
+        return self.response_repo.get_by_id(response_id)
+
+    def create_response(self, data: Dict[str, Any]) -> SurveyResponse:
+        """Create a new survey response."""
+        response = SurveyResponse(**data)
+        return self.response_repo.create(response)
+
+    def update_response(self, response_id: Any, data: Dict[str, Any]) -> SurveyResponse:
+        """Update an existing response."""
+        return self.response_repo.update(response_id, data)
+
+    def delete_response(self, response_id: Any) -> None:
+        """Delete a response by ID."""
+        self.response_repo.delete(response_id)
+
+    # --- Answer CRUD ---
+    def get_answers(self, response_id: Any) -> List[SurveyAnswer]:
+        """Retrieve all answers for a given response."""
+        return self.answer_repo.get_all(filters={'response_id': response_id})
+
+    def get_answer_by_id(self, answer_id: Any) -> Optional[SurveyAnswer]:
+        """Retrieve a single answer by ID."""
+        return self.answer_repo.get_by_id(answer_id)
+
+    def create_answer(self, data: Dict[str, Any]) -> SurveyAnswer:
+        """Create a new survey answer."""
+        answer = SurveyAnswer(**data)
+        return self.answer_repo.create(answer)
+
+    def update_answer(self, answer_id: Any, data: Dict[str, Any]) -> SurveyAnswer:
+        """Update an existing answer."""
+        return self.answer_repo.update(answer_id, data)
+
+    def delete_answer(self, answer_id: Any) -> None:
+        """Delete an answer by ID."""
+        self.answer_repo.delete(answer_id)
