@@ -127,7 +127,7 @@ def init_user_routes(app):
         if user:
             return jsonify({
                 "message": "Logged in successfully",
-                "user_id": user.id 
+                "user_id": user.user_id,
             }), 200
         else:
             return jsonify({"error": "Invalid credentials"}), 401
@@ -137,6 +137,7 @@ def init_user_routes(app):
         """
         Log out the current user.
         """
+        
         return jsonify({"message": "Logged out successfully"}), 200
 
     @app.route("/user/consent", methods=["PUT"])
@@ -150,6 +151,6 @@ def init_user_routes(app):
             return jsonify({"error": "Consent value is required"}), 400
 
         user_service: UserService = app.user_service
-        user = user_service.update_consent(current_user.id, consent)
+        user = user = user_service.update_consent(current_user.user_id, consent)
         return jsonify(user_schema.dump(user)), 200
      

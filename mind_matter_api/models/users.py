@@ -1,5 +1,6 @@
 import sqlalchemy as sa
 from . import db
+from werkzeug.security import generate_password_hash, check_password_hash
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -34,4 +35,4 @@ class User(db.Model):
         return check_password_hash(self.password, password)
 
     def get_id(self):
-        return self.id
+        return self.user_id

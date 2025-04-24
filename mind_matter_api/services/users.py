@@ -52,11 +52,12 @@ class UserService(BaseService):
         user = self.user_repository.get(user_id)
         if not user:
             raise ValueError("User not found")
-        self.user_repository.delete(user)
+        self.user_repository.delete(user_id)
+        return None
+
     def update_consent(self, user_id: str, consent: bool) -> User:
         user = self.user_repository.get(user_id)
         if not user:
             raise ValueError("User not found")
-        user.share_data = consent
-        self.user_repository.update(user)
+        user = self.user_repository.update_consent(user_id, consent)
         return user
