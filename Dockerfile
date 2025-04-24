@@ -1,7 +1,7 @@
 # ================================== BUILDER ===================================
-ARG INSTALL_PYTHON_VERSION=${INSTALL_PYTHON_VERSION:-PYTHON_VERSION_NOT_SET}
-
+ARG INSTALL_PYTHON_VERSION=3.12         
 FROM python:${INSTALL_PYTHON_VERSION}-slim-bullseye AS builder
+
 
 WORKDIR /app
 
@@ -30,15 +30,6 @@ COPY supervisord_programs /etc/supervisor/conf.d
 
 COPY . .
 
-EXPOSE 5000
+EXPOSE 8080
 ENTRYPOINT ["/bin/bash", "shell_scripts/supervisord_entrypoint.sh"]
 CMD ["-c", "/etc/supervisor/supervisord.conf"]
-
-
-# ================================= DEVELOPMENT ================================
-FROM builder AS development
-RUN pip install --no-cache -r requirements/dev.txt
-EXPOSE 2992
-EXPOSE 5000
-
-CMD [ "flask", "run", "--host=0.0.0.0"]
