@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Optional
 from mind_matter_api.models.survey_answers import SurveyAnswer
-from mind_matter_api.repositories.type import Repository
+from mind_matter_api.repositories.types import Repository
 from mind_matter_api.models import db   
 
 class SurveyAnswerRepository(Repository):
