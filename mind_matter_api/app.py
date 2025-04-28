@@ -7,7 +7,7 @@ from environs import Env
 
 from flask import Flask, jsonify
 from flasgger import Swagger
-from flask_cors import CORS
+
 from mind_matter_api.models import User
 from mind_matter_api.api import register_routes
 
@@ -45,13 +45,6 @@ def create_app(config_object="mind_matter_api.settings"):
     register_routes(app)
     configure_logger(app)
 
-    # Enable CORS
-    CORS(
-        app,
-        supports_credentials=True,
-        resources={r"/*": {"origins": app.config.get('CORS_ALLOWED_ORIGINS', [])}},
-    )
-    logger.info(f"CORS enabled for {app.config.get('CORS_ALLOWED_ORIGINS')}")
 
     # Swagger UI
     Swagger(

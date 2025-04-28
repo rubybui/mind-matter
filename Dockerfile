@@ -31,6 +31,6 @@ COPY supervisord_programs /etc/supervisor/conf.d
 COPY . .
 
 ENV PORT = 8080
-EXPOSE 80, 443, 8080
+EXPOSE 8080
 ENTRYPOINT ["/bin/bash", "shell_scripts/supervisord_entrypoint.sh"]
 CMD ["-c", "/etc/supervisor/supervisord.conf"]

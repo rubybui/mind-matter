@@ -43,3 +43,10 @@ Flask-Static-Digest
 # === gRPC ===
 grpcio==1.69.0
 grpcio-tools==1.69.0
+
+# Testing
+factory-boy==3.3.1
+pytest==8.3.4
+pytest-cov==6.0.0
+WebTest==3.0.2
+flasgger
