@@ -20,7 +20,7 @@ class UserService(BaseService):
 
     def get_users(self) -> list[User]:
         # TODO: call UserRepository.get_users when it is implemented
-        return [User(full_name="john_doe", email="john.doe@gmail.com")]
+        return self.user_repository.get_all()
 
     def authenticate_user(self, login_data: dict) -> User:
         email = login_data.get("email")

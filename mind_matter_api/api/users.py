@@ -6,6 +6,8 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 # from cookbook_api.models import User, db
 from mind_matter_api.schemas import UserSchema, UserBodySchema, UserLoginSchema
 from mind_matter_api.services.users import UserService
+from mind_matter_api.utils.auth import get_authenticated_user_id_or_abort
+
 import logging
 logging.basicConfig(level=logging.DEBUG)
 # Single and multiple User schemas
@@ -13,14 +15,6 @@ user_schema = UserSchema()
 users_schema = UserSchema(many=True)
 
 def init_user_routes(app):
-    def get_user_id_from_token(token):
-      from mind_matter_api.models import User
-      try:
-          user_id = User.decode_auth_token(token)
-          return user_id
-      except Exception as e:
-          logging.error(f"Token decoding failed: {str(e)}")
-          return None
 
     """
     Initialize user-related API routes.
@@ -40,15 +34,10 @@ def init_user_routes(app):
               items:
                 $ref: '#/definitions/UserSchema'
         """
-        auth_header = request.headers.get("Authorization")
-        if not auth_header or not auth_header.startswith("Bearer "):
-            return jsonify({"error": "Authorization token required"}), 401
+        user_id = get_authenticated_user_id_or_abort()
+        if isinstance(user_id, tuple):
+          return user_id
 
-        token = auth_header.split(" ")[1]
-        user_id = get_user_id_from_token(token)
-        if not user_id:
-            return jsonify({"error": "Invalid or expired token"}), 401
-            
         user_service: UserService = app.user_service
         users = user_service.get_users()
         return jsonify(users_schema.dump(users)), 200
@@ -106,17 +95,18 @@ def init_user_routes(app):
           404:
             description: User not found
         """
-        auth_header = request.headers.get('Authorization')
-        # Check if the Authorization header exists and starts with "Bearer"
-        if auth_header and auth_header.startswith("Bearer "):
-            # Extract the token (the part after "Bearer ")
-            user_id = auth_header.split(" ")[1]
-            user: UserService = app.user_service.get_user(user_id)
-            return jsonify({
-                "user": user_schema.dump(new_user),
-                "token": token
-            }), 200
-        return jsonify({"error": "Invalid credentials"}), 401 
+        user_id = get_authenticated_user_id_or_abort()
+        if isinstance(user_id, tuple):
+            return user_id
+
+        user_service: UserService = app.user_service
+        user = user_service.get_user(user_id)
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        return jsonify({
+            "user": user_schema.dump(user)
+        }), 200
 
     @app.route("/users/register", methods=["POST"])
     def register():
@@ -183,7 +173,10 @@ def init_user_routes(app):
         """
         Log out the current user.
         """
-        
+        user_id = get_authenticated_user_id_or_abort()
+        if isinstance(user_id, tuple):
+            return user_id
+
         return jsonify({"message": "Logged out successfully"}), 200
 
     @app.route("/user/consent", methods=["PUT"])
@@ -192,11 +185,15 @@ def init_user_routes(app):
         """
         Update user consent for data sharing.
         """
+        user_id = get_authenticated_user_id_or_abort()
+        if isinstance(user_id, tuple):
+            return user_id
+
         consent = request.json.get("consent")
         if consent is None:
             return jsonify({"error": "Consent value is required"}), 400
 
         user_service: UserService = app.user_service
-        user = user = user_service.update_consent(current_user.user_id, consent)
+        user = user_service.update_consent(user_id, consent)
         return jsonify(user_schema.dump(user)), 200
      
