@@ -2,6 +2,11 @@ import sqlalchemy as sa
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
+import datetime
+import logging
+from flask import current_app as app
+
+logging.basicConfig(level=logging.DEBUG)
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -37,25 +42,26 @@ class User(db.Model):
 
     def get_id(self):
         return self.user_id
-
     def encode_auth_token(self, user_id):
-        """
-        Generates the Auth Token
-        :return: string
-        """
         try:
             payload = {
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=5),
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=3600),
                 'iat': datetime.datetime.utcnow(),
                 'sub': user_id
             }
-            return jwt.encode(
-                payload,
-                app.config.get('SECRET_KEY'),
-                algorithm='HS256'
-            )
+            token = jwt.encode(payload, app.secret_key, algorithm='HS256')
+            app.logger.debug(f"app.secret_key: {app.secret_key}")
+            app.logger.debug(f"payload: {payload}")
+
+            if isinstance(token, bytes):  # for PyJWT < 2.0
+                token = token.decode('utf-8')
+            return token
         except Exception as e:
-            return e
+            # log error
+            import traceback
+            print("Token encoding failed:", traceback.format_exc())
+            return None  # ✅ Don't return the error object
+
     
     @staticmethod
     def decode_auth_token(auth_token):

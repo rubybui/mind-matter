@@ -18,3 +18,5 @@ isort==5.13.2
 pep8-naming==0.14.1
 
 Flask-Cors==5.0.0
+
+pyjwt==2.10.1

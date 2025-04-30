@@ -51,4 +51,3 @@ pytest-cov==6.0.0
 WebTest==3.0.2
 flasgger
 
-pyjwt==1.4.2

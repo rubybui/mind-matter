@@ -1,5 +1,7 @@
 from flask import jsonify, request, session
 from marshmallow import ValidationError
+from sqlalchemy.exc import IntegrityError
+import traceback
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 # from cookbook_api.models import User, db
 from mind_matter_api.schemas import UserSchema, UserBodySchema, UserLoginSchema
@@ -62,6 +64,7 @@ def init_user_routes(app):
         with app.app_context():  # Ensures a proper app context
             user_service: UserService = app.user_service
             new_user = user_service.create_user(data)
+            token = new_user.encode_auth_token(new_user.user_id)
             return jsonify(user_schema.dump(new_user)), 201
 
     @app.route("/users/<string:user_id>", methods=["GET"])
@@ -91,7 +94,10 @@ def init_user_routes(app):
             # Extract the token (the part after "Bearer ")
             user_id = auth_header.split(" ")[1]
             user: UserService = app.user_service.get_user(user_id)
-            return jsonify(user_schema.dump(user)), 200
+            return jsonify({
+                "user": user_schema.dump(new_user),
+                "token": token
+            }), 200
         return jsonify({"error": "Invalid credentials"}), 401 
 
     @app.route("/users/register", methods=["POST"])
@@ -100,17 +106,37 @@ def init_user_routes(app):
         Register a new user.
         """
         try:
+            # Validate request payload
             data = UserBodySchema().load(request.get_json())
             user_service: UserService = app.user_service
+
+            # Check if email already exists
             if not user_service.validate_new_email(data['email']):
-                return jsonify({"error": "Invalid Email."}), 400
+                return jsonify({"error": "Email already registered."}), 400
+
             with app.app_context():
                 new_user = user_service.register_user(data)
-                return jsonify(user_schema.dump(new_user)), 201
+                token = new_user.encode_auth_token(new_user.user_id)
+
+                app.logger.debug(f"new_user: {new_user}")
+                app.logger.debug(f"user dump: {user_schema.dump(new_user)}")
+                app.logger.debug(f"token: {token} (type: {type(token)})")
+
+                return jsonify({
+                    "user": user_schema.dump(new_user),
+                    "token": token
+                }), 201
+
         except ValidationError as err:
-            if "email" in err.messages: 
-                return jsonify({"error": "Invalid Email."}), 400
-            return jsonify(err.messages), 400
+            return jsonify({"error": "Validation failed", "messages": err.messages}), 400
+
+        except IntegrityError as e:
+            app.logger.error(f"DB Integrity Error: {str(e)}")
+            return jsonify({"error": "Email already exists."}), 400
+
+        except Exception as e:
+            app.logger.error("Unexpected error:\n" + traceback.format_exc())
+            return jsonify({"error": "Internal server error"}), 500
 
     @app.route("/user/login", methods=["POST"])
     def login():
@@ -125,8 +151,10 @@ def init_user_routes(app):
         user_service: UserService = app.user_service
         user = user_service.authenticate_user(login_data)
         if user:
+            token = user.encode_auth_token(user.user_id)
             return jsonify({
                 "message": "Logged in successfully",
+                "token": token,
                 "user_id": user.user_id,
             }), 200
         else:
