@@ -13,6 +13,15 @@ user_schema = UserSchema()
 users_schema = UserSchema(many=True)
 
 def init_user_routes(app):
+    def get_user_id_from_token(token):
+      from mind_matter_api.models import User
+      try:
+          user_id = User.decode_auth_token(token)
+          return user_id
+      except Exception as e:
+          logging.error(f"Token decoding failed: {str(e)}")
+          return None
+
     """
     Initialize user-related API routes.
     """
@@ -31,6 +40,15 @@ def init_user_routes(app):
               items:
                 $ref: '#/definitions/UserSchema'
         """
+        auth_header = request.headers.get("Authorization")
+        if not auth_header or not auth_header.startswith("Bearer "):
+            return jsonify({"error": "Authorization token required"}), 401
+
+        token = auth_header.split(" ")[1]
+        user_id = get_user_id_from_token(token)
+        if not user_id:
+            return jsonify({"error": "Invalid or expired token"}), 401
+            
         user_service: UserService = app.user_service
         users = user_service.get_users()
         return jsonify(users_schema.dump(users)), 200
