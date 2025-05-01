@@ -6,7 +6,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 # from cookbook_api.models import User, db
 from mind_matter_api.schemas import UserSchema, UserBodySchema, UserLoginSchema
 from mind_matter_api.services.users import UserService
-from mind_matter_api.utils.auth import get_authenticated_user_id_or_abort
+from mind_matter_api.utils.decorators import require_auth, require_owner, require_admin
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -20,6 +20,8 @@ def init_user_routes(app):
     Initialize user-related API routes.
     """
     @app.route("/users", methods=["GET"])
+    @require_auth
+    @require_admin
     def get_users():
         """
         Retrieve all users
@@ -34,10 +36,6 @@ def init_user_routes(app):
               items:
                 $ref: '#/definitions/UserSchema'
         """
-        user_id = get_authenticated_user_id_or_abort()
-        if isinstance(user_id, tuple):
-          return user_id
-
         user_service: UserService = app.user_service
         users = user_service.get_users()
         return jsonify(users_schema.dump(users)), 200
@@ -75,6 +73,8 @@ def init_user_routes(app):
             return jsonify(user_schema.dump(new_user)), 201
 
     @app.route("/users/<string:user_id>", methods=["GET"])
+    @require_auth
+
     def get_user(user_id):
         """
         Get a user by ID
@@ -95,9 +95,6 @@ def init_user_routes(app):
           404:
             description: User not found
         """
-        user_id = get_authenticated_user_id_or_abort()
-        if isinstance(user_id, tuple):
-            return user_id
 
         user_service: UserService = app.user_service
         user = user_service.get_user(user_id)
@@ -169,26 +166,17 @@ def init_user_routes(app):
             return jsonify({"error": "Invalid credentials"}), 401
 
     @app.route("/user/logout", methods=["POST"])
+    @require_auth
     def logout():
         """
         Log out the current user.
         """
-        user_id = get_authenticated_user_id_or_abort()
-        if isinstance(user_id, tuple):
-            return user_id
-
         return jsonify({"message": "Logged out successfully"}), 200
 
     @app.route("/user/consent", methods=["PUT"])
-    @login_required
-    def update_consent():
-        """
-        Update user consent for data sharing.
-        """
-        user_id = get_authenticated_user_id_or_abort()
-        if isinstance(user_id, tuple):
-            return user_id
-
+    @require_auth
+    @require_owner(lambda **kwargs: app.user_service.get_user(kwargs.get("user_id")))
+    def update_consent(user_id):
         consent = request.json.get("consent")
         if consent is None:
             return jsonify({"error": "Consent value is required"}), 400
@@ -196,4 +184,3 @@ def init_user_routes(app):
         user_service: UserService = app.user_service
         user = user_service.update_consent(user_id, consent)
         return jsonify(user_schema.dump(user)), 200
-     
