@@ -6,7 +6,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 # from cookbook_api.models import User, db
 from mind_matter_api.schemas import UserSchema, UserBodySchema, UserLoginSchema
 from mind_matter_api.services.users import UserService
-from mind_matter_api.utils.decorators import require_auth, require_owner
+from mind_matter_api.utils.decorators import require_auth, require_owner, require_admin
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
