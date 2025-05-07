@@ -1,6 +1,7 @@
 from functools import wraps
 from flask import request, jsonify
 from typing import Callable, Any, Dict, List, Optional
+from .pagination_validation import validate_pagination_params
 
 def paginate(schema_class=None):
     """
@@ -11,6 +12,7 @@ def paginate(schema_class=None):
     """
     def decorator(f: Callable):
         @wraps(f)
+        @validate_pagination_params
         def wrapper(*args, **kwargs):
             # Get pagination parameters from request
             page = request.args.get('page', type=int, default=1)
