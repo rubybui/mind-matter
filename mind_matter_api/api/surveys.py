@@ -9,6 +9,9 @@ from mind_matter_api.schemas import (
 from mind_matter_api.services.surveys import SurveyService
 from mind_matter_api.utils.auth import get_authenticated_user_id_or_abort, is_user_admin, is_user_owner
 from mind_matter_api.utils.decorators import require_auth, require_admin, require_owner
+from mind_matter_api.utils.pagination import paginate
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 def init_survey_routes(app):
     svc: SurveyService = app.survey_service
@@ -20,6 +23,10 @@ def init_survey_routes(app):
             page=request.args.get('page', type=int, default=1),
             page_size=request.args.get('page_size', type=int, default=10)
         )
+        app.logger.info(f"[user:{user_id}] Retrieved {len(surveys)} surveys.")
+        app.logger.debug(f"[user:{user_id}] Survey details: {SurveySchema(many=True).dump(surveys)}")
+
+        
         return jsonify(SurveySchema(many=True).dump(surveys)), 200
 
     @app.route('/surveys/<int:survey_id>', methods=['GET'])
@@ -62,9 +69,11 @@ def init_survey_routes(app):
     # --- Questions ---
     @app.route('/surveys/<int:survey_id>/questions', methods=['GET'])
     @require_auth
-    def get_questions(user_id, survey_id):
-        questions = svc.get_questions(survey_id)
-        return jsonify(SurveyQuestionSchema(many=True).dump(questions)), 200
+    @paginate(SurveyQuestionSchema)
+    def get_questions(user_id, survey_id, page=1, page_size=10):
+        questions = svc.get_questions(survey_id, page=page, page_size=page_size)
+        total = svc.get_questions_count(survey_id)
+        return questions, total
 
     @app.route('/surveys/<int:survey_id>/questions', methods=['POST'])
     @require_auth

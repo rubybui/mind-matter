@@ -3,9 +3,9 @@ from mind_matter_api.models.surveys import Survey
 from mind_matter_api.repositories.types import Repository
 from mind_matter_api.models import db   
 
-class SurveyRepository(Repository):
+class SurveyRepository(Repository[Survey]):
     def __init__(self):
-        self.session = db.session
+        super().__init__(Survey)
 
     def create(self, survey: Survey) -> Survey:
         self.session.add(survey)
@@ -20,6 +20,7 @@ class SurveyRepository(Repository):
         if filters:
             for attr, value in filters.items():
                 query = query.filter(getattr(Survey, attr) == value)
+
         return query.offset((page - 1) * page_size).limit(page_size).all()
 
     def update(self, resource_id: Any, data: Dict[str, Any]) -> Survey:

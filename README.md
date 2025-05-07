@@ -1,7 +1,5 @@
 # mind_matter
 
-TechCare Coaching's Cohort 12/2024
-
 ```
 project_root/
 ├── app/

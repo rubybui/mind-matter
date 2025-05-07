@@ -1,11 +1,14 @@
 import logging
-from flask import request, abort
+from flask import request, abort, current_app as app
 from mind_matter_api.models import User
-from mind_matter_api.services import UserService
+from mind_matter_api.services.users import UserService
+
+logging.basicConfig(level=logging.DEBUG)
 
 def get_user_id_from_token(token):
     try:
-        user_id = User.decode_auth_token(token)
+        user_id = User.decode_auth_token(str(token))
+        app.logger.debug(f"uderId: {user_id}")
         return user_id
     except Exception as e:
         logging.error(f"Token decoding failed: {str(e)}")
@@ -17,7 +20,9 @@ def get_authenticated_user_id_or_abort():
         abort(401, description="Authorization token required")
 
     token = auth_header.split(" ")[1]
+    app.logger.debug(f"token: {token}")
     user_id = get_user_id_from_token(token)
+    app.logger.debug(f"uderId: {user_id}")
     if not user_id:
         abort(401, description="Invalid or expired token")
 
