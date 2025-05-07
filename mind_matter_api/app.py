@@ -7,6 +7,7 @@ from environs import Env
 
 from flask import Flask, jsonify
 from flasgger import Swagger
+from flask_cors import CORS
 
 from mind_matter_api.models import User
 from mind_matter_api.api import register_routes
@@ -30,6 +31,8 @@ def create_app(config_object="mind_matter_api.settings"):
     :param config_object: The configuration object to use.
     """
     app = Flask(__name__, root_path=os.path.dirname(os.path.abspath(__file__)))
+    CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)  # <--- THIS LINE
+
     logger = logging.getLogger(__name__)
 
     # Load configuration

@@ -20,6 +20,7 @@ class SurveyRepository(Repository):
         if filters:
             for attr, value in filters.items():
                 query = query.filter(getattr(Survey, attr) == value)
+
         return query.offset((page - 1) * page_size).limit(page_size).all()
 
     def update(self, resource_id: Any, data: Dict[str, Any]) -> Survey:

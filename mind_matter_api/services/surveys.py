@@ -52,9 +52,13 @@ class SurveyService:
         self.survey_repo.delete(survey_id)
 
     # --- Question CRUD ---
-    def get_questions(self, survey_id: Any) -> List[SurveyQuestion]:
-        """Retrieve all questions for a given survey."""
-        return self.question_repo.get_all(filters={'survey_id': survey_id})
+    def get_questions(self, survey_id: Any, page: int = 1, page_size: int = 10) -> List[SurveyQuestion]:
+        """Retrieve paginated questions for a given survey."""
+        return self.question_repo.get_all(page=page, page_size=page_size, filters={'survey_id': survey_id})
+
+    def get_questions_count(self, survey_id: Any) -> int:
+        """Get total count of questions for a survey."""
+        return self.question_repo.get_count(filters={'survey_id': survey_id})
 
     def get_question_by_id(self, question_id: Any) -> Optional[SurveyQuestion]:
         """Retrieve a question by its ID."""

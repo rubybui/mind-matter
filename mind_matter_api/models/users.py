@@ -45,9 +45,9 @@ class User(db.Model):
     def encode_auth_token(self, user_id):
         try:
             payload = {
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=3600),
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=360000),
                 'iat': datetime.datetime.utcnow(),
-                'sub': user_id
+                'sub': str(user_id)
             }
             token = jwt.encode(payload, app.secret_key, algorithm='HS256')
             app.logger.debug(f"app.secret_key: {app.secret_key}")
@@ -62,18 +62,20 @@ class User(db.Model):
             print("Token encoding failed:", traceback.format_exc())
             return None  # ✅ Don't return the error object
 
-    
+
     @staticmethod
     def decode_auth_token(auth_token):
-        """
-        Decodes the auth token
-        :param auth_token:
-        :return: integer|string
-        """
         try:
-            payload = jwt.decode(auth_token, app.config.get('SECRET_KEY'))
+            payload = jwt.decode(str(auth_token), app.config['SECRET_KEY'], algorithms=['HS256'])
+            app.logger.debug(f"[decode_auth_token] payload: {payload}")
             return payload['sub']
-        except jwt.ExpiredSignatureError:
-            return 'Signature expired. Please log in again.'
-        except jwt.InvalidTokenError:
-            return 'Invalid token. Please log in again.'
+        except jwt.ExpiredSignatureError as e:
+            app.logger.warning(f"[decode_auth_token] Token expired: {str(e)}")
+            return None
+        except jwt.InvalidTokenError as e:
+            app.logger.warning(f"[decode_auth_token] Invalid token: {str(e)}")
+            return None
+        except Exception as e:
+            import traceback
+            app.logger.error(f"[decode_auth_token] Unexpected error:\n{traceback.format_exc()}")
+            return None
