@@ -19,7 +19,7 @@ class Repository(Generic[T]):
 
     def get_by_id(self, resource_id: Any) -> Optional[T]:
         """Retrieve a resource by its ID."""
-        return self.session.query(self.model_class).get(resource_id)
+        return self.session.get(self.model_class, resource_id)
 
     def get_all(self, page: int = 1, page_size: int = 10, filters: Optional[Dict[str, Any]] = None) -> List[T]:
         """Retrieve a paginated list of resources, optionally filtered."""

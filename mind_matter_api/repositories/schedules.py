@@ -3,9 +3,9 @@ from mind_matter_api.models.schedules import SurveySchedule
 from mind_matter_api.repositories.types import Repository
 from mind_matter_api.models import db   
 
-class SurveyScheduleRepository(Repository):
+class SurveyScheduleRepository(Repository[SurveySchedule]):
     def __init__(self):
-        self.session = db.session
+        super().__init__(SurveySchedule)
 
     def create(self, schedule: SurveySchedule) -> SurveySchedule:
         self.session.add(schedule)

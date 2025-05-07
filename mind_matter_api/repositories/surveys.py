@@ -3,9 +3,9 @@ from mind_matter_api.models.surveys import Survey
 from mind_matter_api.repositories.types import Repository
 from mind_matter_api.models import db   
 
-class SurveyRepository(Repository):
+class SurveyRepository(Repository[Survey]):
     def __init__(self):
-        self.session = db.session
+        super().__init__(Survey)
 
     def create(self, survey: Survey) -> Survey:
         self.session.add(survey)
