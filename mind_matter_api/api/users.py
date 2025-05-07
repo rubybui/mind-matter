@@ -72,21 +72,14 @@ def init_user_routes(app):
             token = new_user.encode_auth_token(new_user.user_id)
             return jsonify(user_schema.dump(new_user)), 201
 
-    @app.route("/users/<string:user_id>", methods=["GET"])
+    @app.route("/users/me", methods=["GET"])
     @require_auth
-
     def get_user(user_id):
         """
-        Get a user by ID
+        Get the authenticated user's details
         ---
         tags:
           - Users
-        parameters:
-          - in: path
-            name: user_id
-            type: string
-            required: true
-            description: ID of the user
         responses:
           200:
             description: User details
@@ -95,7 +88,6 @@ def init_user_routes(app):
           404:
             description: User not found
         """
-
         user_service: UserService = app.user_service
         user = user_service.get_user(user_id)
         if not user:
@@ -104,6 +96,34 @@ def init_user_routes(app):
         return jsonify({
             "user": user_schema.dump(user)
         }), 200
+
+    @app.route("/users/me/delete", methods=["DELETE"])
+    @require_auth
+    def delete_user(user_id):
+        """
+        Delete the authenticated user's account
+        ---
+        tags:
+          - Users
+        responses:
+          204:
+            description: User account successfully deleted
+          404:
+            description: User not found
+          500:
+            description: Internal server error
+        """
+        try:
+            user_service: UserService = app.user_service
+            user = user_service.get_user(user_id)
+            if not user:
+                return jsonify({"error": "User not found"}), 404
+
+            user_service.delete_user(user_id)
+            return '', 204
+        except Exception as e:
+            app.logger.error(f"Error deleting user: {str(e)}")
+            return jsonify({"error": "Failed to delete user account"}), 500
 
     @app.route("/users/register", methods=["POST"])
     def register():
@@ -167,9 +187,15 @@ def init_user_routes(app):
 
     @app.route("/user/logout", methods=["POST"])
     @require_auth
-    def logout():
+    def logout(user_id):
         """
         Log out the current user.
+        ---
+        tags:
+          - Users
+        responses:
+          200:
+            description: Successfully logged out
         """
         return jsonify({"message": "Logged out successfully"}), 200
 
