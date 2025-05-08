@@ -17,6 +17,7 @@ Flask-Migrate==4.0.7  # Handles database migrations with Alembic
 
 # === Authentication and User Management ===
 Flask-Login==0.6.3  # User session management for Flask
+PyJWT==2.8.0  # JSON Web Token implementation
 
 # === Deployment ===
 gevent==24.11.1  # Asynchronous networking library for concurrent requests
