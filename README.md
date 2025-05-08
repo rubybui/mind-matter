@@ -1,5 +1,7 @@
 # mind_matter
 
+Frontend Application: [Mind Matter Frontend](https://mind-matter-frontend.vercel.app/)
+
 ```
 project_root/
 ├── app/
