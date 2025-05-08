@@ -70,20 +70,37 @@ class SurveyQuestionSchema(ma.SQLAlchemyAutoSchema):
         model = SurveyQuestion
         load_instance = True
         include_fk = True
-    
-    
+
 class SurveyResponseSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = SurveyResponse
         load_instance = True
         include_fk = True
-
+        
+    response_id = fields.Int(dump_only=True, required=False)  # Make it optional and read-only
+    survey_id = fields.Int(required=True)
+    user_id = fields.Int(required=True)
+    submitted_at = fields.DateTime(dump_only=True)
+    
+    # Relationships - exclude nested answers to prevent circular reference
+    survey = fields.Nested(SurveySchema, dump_only=True)
+    user = fields.Nested(UserSchema, dump_only=True)
+    answers = fields.Nested('SurveyAnswerSchema', many=True, dump_only=True, exclude=('response',))
 
 class SurveyAnswerSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = SurveyAnswer
         load_instance = True
         include_fk = True
+        
+    answer_id = fields.Int(dump_only=True)  # Auto-generated
+    response_id = fields.Int(required=True)  # Required when creating
+    question_id = fields.Int(required=True)
+    answer_value = fields.Str(required=True)
+    
+    # Relationships - exclude nested response to prevent circular reference
+    response = fields.Nested('SurveyResponseSchema', dump_only=True, exclude=('answers',))
+    question = fields.Nested(SurveyQuestionSchema, dump_only=True)
 
 
 class SurveyScheduleSchema(ma.SQLAlchemyAutoSchema):

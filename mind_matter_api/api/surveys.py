@@ -116,12 +116,30 @@ def init_survey_routes(app):
     @require_auth
     def create_response(user_id, survey_id):
         try:
-            data = SurveyResponseSchema().load(request.get_json())
+            app.logger.debug(f"Creating response for survey {survey_id} by user {user_id}")
+            
+            # Get request data and add required fields
+            data = request.get_json() or {}
+            data['survey_id'] = survey_id
+            data['user_id'] = user_id
+            
+            app.logger.debug(f"Request data with IDs: {data}")
+            
+            # Validate the complete data
+            validated_data = SurveyResponseSchema().load(data)
+            app.logger.debug(f"Validated data: {validated_data}")
+            
+            # Create the response
+            r = svc.create_response(validated_data)
+            app.logger.debug(f"Created response: {SurveyResponseSchema().dump(r)}")
+            
+            return jsonify(SurveyResponseSchema().dump(r)), 201
         except ValidationError as err:
+            app.logger.error(f"Validation error: {err.messages}")
             return jsonify(err.messages), 400
-        data['survey_id'] = survey_id
-        r = svc.create_response(data)
-        return jsonify(SurveyResponseSchema().dump(r)), 201
+        except Exception as e:
+            app.logger.error(f"Unexpected error: {str(e)}")
+            return jsonify({'error': str(e)}), 500
 
     @app.route('/responses/<int:response_id>', methods=['PUT'])
     @require_auth
@@ -152,12 +170,29 @@ def init_survey_routes(app):
     @require_auth
     def create_answer(user_id, response_id):
         try:
-            data = SurveyAnswerSchema().load(request.get_json())
+            app.logger.debug(f"Creating answer for response {response_id} by user {user_id}")
+            
+            # Load and validate the request data
+            request_data = request.get_json()
+            app.logger.debug(f"Request data: {request_data}")
+            
+            request_data['response_id'] = response_id  # Add response_id to the request data
+            app.logger.debug(f"Request data with response_id: {request_data}")
+            
+            validated_data = SurveyAnswerSchema().load(request_data)
+            app.logger.debug(f"Validated data: {validated_data}")
+            
+            # Create the answer
+            a = svc.create_answer(validated_data)
+            app.logger.debug(f"Created answer: {SurveyAnswerSchema().dump(a)}")
+            
+            return jsonify(SurveyAnswerSchema().dump(a)), 201
         except ValidationError as err:
+            app.logger.error(f"Validation error: {err.messages}")
             return jsonify(err.messages), 400
-        data['response_id'] = response_id
-        a = svc.create_answer(data)
-        return jsonify(SurveyAnswerSchema().dump(a)), 201
+        except Exception as e:
+            app.logger.error(f"Unexpected error: {str(e)}")
+            return jsonify({'error': str(e)}), 500
 
     @app.route('/answers/<int:answer_id>', methods=['PUT'])
     @require_auth
