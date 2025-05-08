@@ -88,7 +88,15 @@ class SurveyService:
 
     def create_response(self, data: Dict[str, Any]) -> SurveyResponse:
         """Create a new survey response."""
-        response = SurveyResponse(**data)
+        # If data is already a SurveyResponse instance, use it directly
+        if isinstance(data, SurveyResponse):
+            return self.response_repo.create(data)
+        
+        # Otherwise create a new instance with the dictionary data
+        response = SurveyResponse(
+            survey_id=data['survey_id'],
+            user_id=data['user_id']
+        )
         return self.response_repo.create(response)
 
     def update_response(self, response_id: Any, data: Dict[str, Any]) -> SurveyResponse:
@@ -110,7 +118,16 @@ class SurveyService:
 
     def create_answer(self, data: Dict[str, Any]) -> SurveyAnswer:
         """Create a new survey answer."""
-        answer = SurveyAnswer(**data)
+        # If data is already a SurveyAnswer instance, use it directly
+        if isinstance(data, SurveyAnswer):
+            return self.answer_repo.create(data)
+        
+        # Otherwise create a new instance with the dictionary data
+        answer = SurveyAnswer(
+            response_id=data['response_id'],
+            question_id=data['question_id'],
+            answer_value=data['answer_value']
+        )
         return self.answer_repo.create(answer)
 
     def update_answer(self, answer_id: Any, data: Dict[str, Any]) -> SurveyAnswer:
