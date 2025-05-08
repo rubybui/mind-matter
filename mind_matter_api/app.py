@@ -22,6 +22,7 @@ from mind_matter_api.extensions import (
     flask_static_digest,
     migrate,
     login_manager,
+    mail,
 )
 
 
@@ -87,6 +88,7 @@ def register_extensions(app):
     migrate.init_app(app, db)
     flask_static_digest.init_app(app)
     login_manager.init_app(app)
+    mail.init_app(app)
 
 
 def register_errorhandlers(app):

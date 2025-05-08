@@ -12,13 +12,16 @@ from mind_matter_api.repositories.survey_questions import SurveyQuestionReposito
 from mind_matter_api.repositories.survey_responses import SurveyResponseRepository
 from mind_matter_api.services.surveys import SurveyService
 
+# email
+from mind_matter_api.api.email import init_email_routes
+
 def register_routes(app):
     # --- wire up your services ---
     app.user_service = UserService(UserRepository())
 
     # --- mount your route init functions ---
     init_user_routes(app)
-
+    init_email_routes(app)
 
     app.survey_service = SurveyService(SurveyRepository(), 
                                       SurveyQuestionRepository(), 

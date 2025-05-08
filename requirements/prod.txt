@@ -51,3 +51,4 @@ pytest-cov==6.0.0
 WebTest==3.0.2
 flasgger
 
+Flask-Mail

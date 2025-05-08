@@ -6,6 +6,7 @@ from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from flask_mail import Mail
 
 from flask_static_digest import FlaskStaticDigest
 from flask_wtf.csrf import CSRFProtect
@@ -18,3 +19,4 @@ cache = Cache()
 debug_toolbar = DebugToolbarExtension()
 flask_static_digest = FlaskStaticDigest()
 login_manager = LoginManager()
+mail = Mail()
