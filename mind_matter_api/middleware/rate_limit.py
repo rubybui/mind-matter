@@ -1,7 +1,7 @@
 import time
 from flask import request, jsonify
 from mind_matter_api.extensions import cache
-from mind_matter_api.utils.auth import decode_auth_token  # assume this exists
+from mind_matter_api.utils.auth import get_user_id_from_token  # assume this exists
 
 def get_rate_limit_identity():
     # 1. Check for Device ID header (mobile apps)
@@ -15,7 +15,7 @@ def get_rate_limit_identity():
         token_type, token = auth_header.split(" ", 1)
         if token_type.lower() == "bearer":
             try:
-                user_id = decode_auth_token(token)
+                user_id = get_user_id_from_token(token)
                 if user_id:
                     return f"user:{user_id}"
             except Exception:
