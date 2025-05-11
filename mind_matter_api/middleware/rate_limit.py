@@ -1,8 +1,18 @@
 import time
 from flask import request, jsonify
 from mind_matter_api.extensions import cache   
-def rate_limit_middleware(limit: int, window: int):
+
+
+def rate_limit_middleware(limit: int, window: int, exclude_paths=None, exclude_methods=None):
+    exclude_paths = exclude_paths or []
+    exclude_methods = exclude_methods or []
+
     def middleware():
+        cache.set("foo", "bar")
+        print(cache.get("foo"))  
+        if request.path in exclude_paths or request.method in exclude_methods:
+            return 
+
         ip = request.remote_addr or "global"
         key = f"rate-limit:{ip}:{request.endpoint}"
         now = time.time()
@@ -19,4 +29,5 @@ def rate_limit_middleware(limit: int, window: int):
                 cache.set(key, (1, now))
         else:
             cache.set(key, (1, now))
+
     return middleware

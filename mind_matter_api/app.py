@@ -33,16 +33,12 @@ def create_app(config_object="mind_matter_api.settings"):
     :param config_object: The configuration object to use.
     """
     app = Flask(__name__, root_path=os.path.dirname(os.path.abspath(__file__)))
-    CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)  # <
+    CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=False)  # <
     
     # Rate limiter using flask-caching (memcached )
     
     logger = logging.getLogger(__name__)
-    if not hasattr(cache, '_cache'):  # or check if cache.cache is None
-        cache.init_app(app)
 
-
-    app.before_request(rate_limit_middleware(limit=5, window=60))
     # Load configuration
     app.config.from_object(config_object)
     app.config["SQLALCHEMY_RECORD_QUERIES"] = True
@@ -56,6 +52,11 @@ def create_app(config_object="mind_matter_api.settings"):
     register_routes(app)
     configure_logger(app)
 
+    app.before_request(rate_limit_middleware(
+        limit=5,
+        window=60,
+        exclude_paths=["/health"]
+    ))
 
     # Swagger UI
     Swagger(
