@@ -16,6 +16,12 @@ services:
     ports:
       - "5000:5000"
       - "2992:2992"
+    environment:
+      CACHE_MEMCACHED_SERVERS: memcached:11211
+      FLASK_ENV: development
+      FLASK_DEBUG: 1
+    depends_on:
+      - memcached
     <<: *default_volumes
 
   mind-matter-flask-prod:
@@ -32,6 +38,9 @@ services:
       FLASK_DEBUG: 0
       LOG_LEVEL: info
       GUNICORN_WORKERS: 4
+      CACHE_MEMCACHED_SERVERS: memcached:11211
+    depends_on:
+      - memcached
     <<: *default_volumes
 
   mind-matter-manage:
@@ -48,3 +57,16 @@ services:
     stdin_open: true
     tty: true
     <<: *default_volumes
+
+  memcached:
+    image: memcached:alpine
+    ports:
+      - "11211:11211"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "echo", "version", "|", "nc", "localhost", "11211"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+
+
