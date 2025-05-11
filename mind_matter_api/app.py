@@ -13,6 +13,7 @@ from mind_matter_api.models import User
 from mind_matter_api.api import register_routes
 
 from mind_matter_api.schemas import UserSchema, UserBodySchema
+from mind_matter_api.middleware.rate_limit import rate_limit_middleware
 from mind_matter_api.extensions import (
     cache,
     csrf_protect,
@@ -32,8 +33,10 @@ def create_app(config_object="mind_matter_api.settings"):
     :param config_object: The configuration object to use.
     """
     app = Flask(__name__, root_path=os.path.dirname(os.path.abspath(__file__)))
-    CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)  # <--- THIS LINE
-
+    CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=False)  # <
+    
+    # Rate limiter using flask-caching (memcached )
+    
     logger = logging.getLogger(__name__)
 
     # Load configuration
@@ -49,6 +52,11 @@ def create_app(config_object="mind_matter_api.settings"):
     register_routes(app)
     configure_logger(app)
 
+    app.before_request(rate_limit_middleware(
+        limit=5,
+        window=60,
+        exclude_paths=["/health"]
+    ))
 
     # Swagger UI
     Swagger(

@@ -16,6 +16,11 @@ services:
     ports:
       - "5000:5000"
       - "2992:2992"
+    environment:
+
+      FLASK_ENV: development
+      FLASK_DEBUG: 1
+
     <<: *default_volumes
 
   mind-matter-flask-prod:
