@@ -24,19 +24,14 @@ def require_owner(resource_getter):
     def decorator(f):
         @wraps(f)
         def decorated(user_id, *args, **kwargs):
-            app.logger.debug(f"[require_owner] Checking ownership for user_id: {user_id}")
-            app.logger.debug(f"[require_owner] Args: {args}")
-            app.logger.debug(f"[require_owner] Kwargs: {kwargs}")
-            
+
             try:
                 resource = resource_getter(*args, **kwargs)
-                app.logger.debug(f"[require_owner] Got resource: {resource}")
-                
+   
                 if not is_user_owner(user_id, resource) and not is_user_admin(user_id):
                     app.logger.debug(f"[require_owner] Permission denied for user {user_id}")
                     abort(403, description="Permission denied")
                 
-                app.logger.debug(f"[require_owner] Permission granted for user {user_id}")
                 return f(user_id, resource, *args, **kwargs)
             except Exception as e:
                 app.logger.error(f"[require_owner] Error checking ownership: {str(e)}")

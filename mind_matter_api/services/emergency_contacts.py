@@ -20,7 +20,6 @@ class EmergencyContactsService(BaseService):
         return created_contact
 
     def update_emergency_contacts(self, contact_id: int, contact_data: Dict[str, Any]) -> EmergencyContact:
-        logging.debug(f"[update_emergency_contacts] Updating contact {contact_id} with data: {contact_data}")
         # If contact_data is an EmergencyContact instance, convert it to a dict
         if isinstance(contact_data, EmergencyContact):
             contact_data = {
@@ -28,7 +27,7 @@ class EmergencyContactsService(BaseService):
                 'phone_number': contact_data.phone_number,
                 'description': contact_data.description
             }
-        logging.debug(f"[update_emergency_contacts] Converted data: {contact_data}")
+
         return self.emergency_contacts_repository.update(contact_id, contact_data)
 
     def delete_emergency_contacts(self, contact_id: int) -> None:
