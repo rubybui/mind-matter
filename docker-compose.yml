@@ -16,8 +16,9 @@ services:
     ports:
       - "5000:5000"
       - "2992:2992"
+    env_file:
+      - .env
     environment:
-
       FLASK_ENV: development
       FLASK_DEBUG: 1
 
@@ -32,6 +33,8 @@ services:
     image: "mind-matter-production"
     ports:
       - "5000:5000"
+    env_file:
+      - .env
     environment:
       FLASK_ENV: production
       FLASK_DEBUG: 0
@@ -46,6 +49,8 @@ services:
       args:
         <<: *build_args
     entrypoint: flask
+    env_file:
+      - .env
     environment:
       FLASK_ENV: production
       FLASK_DEBUG: 0

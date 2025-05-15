@@ -12,6 +12,7 @@ class Survey(db.Model):
     updated_at = db.Column(db.DateTime, server_default=sa.func.now(), onupdate=sa.func.now())
 
     # Relationships
+    user = db.relationship("User", back_populates="surveys")
     questions = db.relationship("SurveyQuestion", back_populates="survey")
     responses = db.relationship("SurveyResponse", back_populates="survey")
     schedules = db.relationship("SurveySchedule", back_populates="survey")

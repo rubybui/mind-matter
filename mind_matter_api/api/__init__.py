@@ -15,6 +15,11 @@ from mind_matter_api.services.surveys import SurveyService
 # email
 from mind_matter_api.api.email import init_email_routes
 
+# emergency contacts
+from mind_matter_api.api.emergency_contacts import init_emergency_contacts_routes
+from mind_matter_api.repositories.emergency_contacts import EmergencyContactRepository
+from mind_matter_api.services.emergency_contacts import EmergencyContactsService
+
 def register_routes(app):
     # --- wire up your services ---
     app.user_service = UserService(UserRepository())
@@ -28,3 +33,7 @@ def register_routes(app):
                                       SurveyResponseRepository(), 
                                       SurveyAnswerRepository())
     init_survey_routes(app)
+
+    # Initialize emergency contacts service and routes
+    app.emergency_contacts_service = EmergencyContactsService(EmergencyContactRepository())
+    init_emergency_contacts_routes(app)

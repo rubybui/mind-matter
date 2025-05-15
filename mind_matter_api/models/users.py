@@ -33,6 +33,8 @@ class User(db.Model):
     campaign_participation = db.relationship("CampaignParticipation", back_populates="user")
     incentives = db.relationship("Incentive", back_populates="user")
     reward_redemptions = db.relationship("RewardRedemption", back_populates="user")
+    surveys = db.relationship("Survey", back_populates="user")
+    emergency_contacts = db.relationship("EmergencyContact", back_populates="user")
     
     def set_password(self, password: str):
         self.password = generate_password_hash(password)
@@ -66,7 +68,7 @@ class User(db.Model):
     @staticmethod
     def decode_auth_token(auth_token):
         try:
-            payload = jwt.decode(str(auth_token), app.config['SECRET_KEY'], algorithms=['HS256'])
+            payload = jwt.decode(str(auth_token), app.secret_key, algorithms=['HS256'])
             app.logger.debug(f"[decode_auth_token] payload: {payload}")
             return payload['sub']
         except jwt.ExpiredSignatureError as e:
