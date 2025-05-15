@@ -1,13 +1,14 @@
-
 from typing import Any, Dict, List, Optional
 from mind_matter_api.models.emergency_contacts import EmergencyContact
-from mind_matter_api.repositories.types import Repository   
+from mind_matter_api.repositories.types import Repository
 from mind_matter_api.models import db
 
-
-class EmergencyContactRepository(Repository):
+class EmergencyContactRepository(Repository[EmergencyContact]):
     def __init__(self):
-        self.session = db.session
+        super().__init__(EmergencyContact)
+
+    def get_by_user_id(self, user_id: str) -> List[EmergencyContact]:
+        return self.session.query(EmergencyContact).filter(EmergencyContact.user_id == user_id).all()
 
     def create(self, contact: EmergencyContact) -> EmergencyContact:
         self.session.add(contact)
