@@ -16,6 +16,7 @@ class Survey(db.Model):
     questions = db.relationship("SurveyQuestion", back_populates="survey")
     responses = db.relationship("SurveyResponse", back_populates="survey")
     schedules = db.relationship("SurveySchedule", back_populates="survey")
+    campaigns = db.relationship("Campaign", secondary="campaign_surveys", back_populates="surveys")
 
 class SurveyQuestion(db.Model):
     __tablename__ = 'survey_questions'
