@@ -12,6 +12,11 @@ from mind_matter_api.repositories.survey_questions import SurveyQuestionReposito
 from mind_matter_api.repositories.survey_responses import SurveyResponseRepository
 from mind_matter_api.services.surveys import SurveyService
 
+# campaigns
+from mind_matter_api.api.campaigns import init_campaigns_routes
+from mind_matter_api.repositories.campaigns import CampaignRepository
+from mind_matter_api.services.campaigns import CampaignsService
+
 # email
 from mind_matter_api.api.email import init_email_routes
 
@@ -37,3 +42,7 @@ def register_routes(app):
     # Initialize emergency contacts service and routes
     app.emergency_contacts_service = EmergencyContactsService(EmergencyContactRepository())
     init_emergency_contacts_routes(app)
+
+    # Initialize campaigns service and routes
+    app.campaign_service = CampaignsService(CampaignRepository())
+    init_campaigns_routes(app)
