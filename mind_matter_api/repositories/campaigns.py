@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Optional
-from mind_matter_api.models.campaigns import Campaign
-from mind_matter_api.repositories.type import Repository
+from mind_matter_api.models.campaigns import Campaign, CampaignParticipation
+from mind_matter_api.repositories.types import Repository
 from mind_matter_api.models import db   
 
 class CampaignRepository(Repository):
@@ -37,3 +37,9 @@ class CampaignRepository(Repository):
             raise ValueError("Resource not found")
         self.session.delete(campaign)
         self.session.commit()
+
+    def get_survey_responses_count(self, campaign_id: str) -> int:
+        return self.session.query(Campaign).filter(Campaign.campaign_id == campaign_id).count()
+
+    def get_campaign_participation(self, campaign_id: str) -> CampaignParticipation:
+        return self.session.query(CampaignParticipation).filter(CampaignParticipation.campaign_id == campaign_id).all()
