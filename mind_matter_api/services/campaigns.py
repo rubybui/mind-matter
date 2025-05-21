@@ -1,5 +1,5 @@
 from mind_matter_api.services.types import BaseService
-from mind_matter_api.models.campaigns import Campaigns
+from mind_matter_api.models.campaigns import Campaigns, CampaignParticipation
 from mind_matter_api.repositories.campaigns import CampaignsRepository
 
 class CampaignsService(BaseService):
@@ -10,6 +10,14 @@ class CampaignsService(BaseService):
         campaigns = self.campaigns_repository.get(user_id)
         return campaigns
 
+    def get_survey_responses_count(self, campaign_id: str) -> int:
+        survey_responses_count = self.campaigns_repository.get_survey_responses_count(campaign_id)
+        return survey_responses_count
+    
+    def get_campaign_participation(self, campaign_id: str) -> CampaignParticipation:
+        campaign_participation = self.campaigns_repository.get_campaign_participation(campaign_id)
+        return campaign_participation
+    
     def create_campaigns(self, user_data: Campaigns) -> Campaigns:
         new_campaigns = Campaigns(**user_data)
         created_campaigns = self.campaigns_repository.create(new_campaigns)

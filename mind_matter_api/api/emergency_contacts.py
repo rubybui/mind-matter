@@ -9,14 +9,14 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 
 def init_emergency_contacts_routes(app):
-    svc: EmergencyContactsService = app.emergency_contacts_service
+    emergency_contact_service: EmergencyContactsService = app.emergency_contacts_service
 
     @app.route('/emergency-contacts', methods=['GET'])
     @require_auth
     def get_emergency_contacts(user_id):
         """Get all emergency contacts for the current user"""
         try:
-            emergency_contacts = svc.get_emergency_contacts(user_id)
+            emergency_contacts = emergency_contact_service.get_emergency_contacts(user_id)
             return jsonify(EmergencyContactSchema(many=True).dump(emergency_contacts)), 200
         except Exception as e:
             app.logger.error(f"Error retrieving emergency contacts: {str(e)}")
@@ -38,7 +38,7 @@ def init_emergency_contacts_routes(app):
             contact_data = EmergencyContactSchema().dump(validated_data)
             
             # Create the emergency contact
-            new_contact = svc.create_emergency_contacts(user_id, contact_data)
+            new_contact = emergency_contact_service.create_emergency_contacts(user_id, contact_data)
             
             return jsonify(EmergencyContactSchema().dump(new_contact)), 201
         except ValidationError as err:
@@ -54,7 +54,7 @@ def init_emergency_contacts_routes(app):
         """Update an existing emergency contact"""
         try:
             # First check if the contact exists
-            contact = svc.emergency_contacts_repository.get_by_id(contact_id)
+            contact = emergency_contact_service.emergency_contacts_repository.get_by_id(contact_id)
             if not contact:
                 return jsonify({'error': 'Emergency contact not found'}), 404
                 
@@ -68,7 +68,7 @@ def init_emergency_contacts_routes(app):
             # Validate the data
             data = EmergencyContactSchema().load(request_data, partial=True)
             # Update the contact
-            updated = svc.update_emergency_contacts(contact_id, data)
+            updated = emergency_contact_service.update_emergency_contacts(contact_id, data)
             return jsonify(EmergencyContactSchema().dump(updated)), 200
         except ValidationError as err:
             app.logger.error(f"Validation error: {err.messages}")
@@ -83,7 +83,7 @@ def init_emergency_contacts_routes(app):
         """Delete an emergency contact"""
         try:
             # First check if the contact exists
-            contact = svc.emergency_contacts_repository.get_by_id(contact_id)
+            contact = emergency_contact_service.emergency_contacts_repository.get_by_id(contact_id)
             if not contact:
                 return jsonify({'error': 'Emergency contact not found'}), 404
                 
@@ -91,7 +91,7 @@ def init_emergency_contacts_routes(app):
             if not is_user_owner(user_id, contact) and not is_user_admin(user_id):
                 return jsonify({'error': 'Permission denied'}), 403
 
-            svc.delete_emergency_contacts(contact_id)
+            emergency_contact_service.delete_emergency_contacts(contact_id)
             return '', 204
         except Exception as e:
             app.logger.error(f"Error deleting emergency contact: {str(e)}")
