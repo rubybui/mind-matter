@@ -44,5 +44,5 @@ def register_routes(app):
     init_emergency_contacts_routes(app)
 
     # Initialize campaigns service and routes
-    app.campaign_service = CampaignsService(CampaignRepository())
+    app.campaigns_service = CampaignsService(CampaignRepository())
     init_campaigns_routes(app)
