@@ -17,6 +17,7 @@ class Campaign(db.Model):
     # Relationship to CampaignParticipation
     participants = db.relationship("CampaignParticipation", back_populates="campaign")
     surveys = db.relationship("Survey", secondary="campaign_surveys", back_populates="campaigns")
+    incentives = db.relationship("Incentive", back_populates="campaign")
 
 class CampaignParticipation(db.Model):
     __tablename__ = 'campaign_participation'

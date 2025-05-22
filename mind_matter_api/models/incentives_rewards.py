@@ -5,13 +5,13 @@ class Incentive(db.Model):
     __tablename__ = 'incentives'
 
     incentive_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.campaign_id'), nullable=False)
     points = db.Column(db.Integer, nullable=False)
     reason = db.Column(db.String(255), nullable=True)
     awarded_at = db.Column(db.DateTime, server_default=sa.func.now())
 
-    # Relationship to User
-    user = db.relationship("User", back_populates="incentives")
+    # Relationship to Campaign
+    campaign = db.relationship("Campaign", back_populates="incentives")
 
 class Reward(db.Model):
     __tablename__ = 'rewards'
@@ -22,6 +22,7 @@ class Reward(db.Model):
     cost_points = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, server_default=sa.func.now())
     updated_at = db.Column(db.DateTime, server_default=sa.func.now(), onupdate=sa.func.now())
+
 class RewardRedemption(db.Model):
     __tablename__ = 'reward_redemptions'
 
