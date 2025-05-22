@@ -31,7 +31,6 @@ class User(db.Model):
     mood_logs = db.relationship("MoodActivityLog", back_populates="user")
     notifications = db.relationship("Notification", back_populates="user")
     campaign_participation = db.relationship("CampaignParticipation", back_populates="user")
-    incentives = db.relationship("Incentive", back_populates="user")
     reward_redemptions = db.relationship("RewardRedemption", back_populates="user")
     surveys = db.relationship("Survey", back_populates="user")
     emergency_contacts = db.relationship("EmergencyContact", back_populates="user")
